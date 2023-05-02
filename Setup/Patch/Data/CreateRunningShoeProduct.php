@@ -1,14 +1,13 @@
 <?php
 /**
- * @category    Men
- * @package     Men_Migration
+ * @category    Scandiweb
+ * @package     Scandiweb_Test
  * @author      Vishwanath Veerni <vishwanath.veerni@scandiweb.com>
  * @copyright   Copyright (c) 2023 Scandiweb, Ltd (https://scandiweb.com)
  */
 
-namespace Scandiweb\Migration\Setup\Patch\Data;
+namespace Scandiweb\Test\Setup\Patch\Data;
 
-use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
 use Magento\Catalog\Api\CategoryLinkManagementInterface;
 use Magento\Catalog\Api\Data\ProductInterfaceFactory;
 use Magento\Catalog\Api\ProductRepositoryInterface;
@@ -16,6 +15,7 @@ use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\Catalog\Model\Product\Type;
 use Magento\Catalog\Model\Product\Visibility;
+use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
 use Magento\Eav\Setup\EavSetup;
 use Magento\Framework\App\State;
 use Magento\Framework\Exception\CouldNotSaveException;
@@ -88,7 +88,7 @@ class CreateRunningShoeProduct implements DataPatchInterface
      * @param SourceItemsSaveInterface $sourceItemsSaveInterface
      * @param State $appState
      * @param StoreManagerInterface $storeManager
-		 * @param EavSetup $eavSetup
+     * @param EavSetup $eavSetup
      * @param CategoryLinkManagementInterface $categoryLink
      */
     public function __construct(
@@ -111,6 +111,14 @@ class CreateRunningShoeProduct implements DataPatchInterface
         $this->sourceItemsSaveInterface = $sourceItemsSaveInterface;
         $this->categoryLink = $categoryLink;
         $this->categoryCollectionFactory = $categoryCollectionFactory;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function getDependencies(): array
+    {
+        return [];
     }
 
     /**
@@ -138,11 +146,11 @@ class CreateRunningShoeProduct implements DataPatchInterface
 
         $attributeSetId = $this->eavSetup->getAttributeSetId(Product::ENTITY, 'Default');
         $websiteIDs = [$this->storeManager->getStore()->getWebsiteId()];
-				$product->setTypeId(Type::TYPE_SIMPLE)
+        $product->setTypeId(Type::TYPE_SIMPLE)
             ->setWebsiteIds($websiteIDs)
             ->setAttributeSetId($attributeSetId)
             ->setName('Running Shoe')
-			->setUrlKey('runningshoe')
+            ->setUrlKey('runningshoe')
             ->setSku('running-shoe')
             ->setPrice(25.78)
             ->setVisibility(Visibility::VISIBILITY_BOTH)
@@ -165,15 +173,7 @@ class CreateRunningShoeProduct implements DataPatchInterface
             ->addAttributeToFilter('name', ['in' => $categoryTitles])
             ->getAllIds();
 
-	    $this->categoryLink->assignProductToCategories($product->getSku(), $categoryIds);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public static function getDependencies(): array
-    {
-        return [];
+        $this->categoryLink->assignProductToCategories($product->getSku(), $categoryIds);
     }
 
     /**
